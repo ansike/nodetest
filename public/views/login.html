@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>login</title>
+    <link rel="stylesheet" href="../css/bootstrap.css" />
+    <script src="../js/jquery-1.12.4.js"></script>
+</head>
+
+<body>
+    <div style="position:absolute;top:30%;left:40%;background:#ccc;padding:20px;">
+        <h1 style="text-align: center;">登录</h1> 用户名:
+        <input type="text" id="username" class="form-inline" />
+        <br/> 密&nbsp;码:
+        <input type="password" id="passwd" class="form-inline" />
+        <br/>
+        <input type="text" id="randomCode" ><img style="display: inline-block;width: 40px;height: 20px;" src="/users/getRandomCode">
+        <br />
+        <button class="btn btn-primary pull-right" onclick="login()">登录</button>
+        <button class="btn btn-primary pull-right" onclick="register()">注册</button>
+    </div>
+</body>
+
+</html>
+<script>
+function login() {
+    var username = $('#username').val();
+    var passwd = $('#passwd').val();
+    var randomCode = $('#randomCode').val();
+    $.ajax({
+        url: '/users/login',
+        type: 'post',
+        data: {
+            "name": username,
+            "pwd": passwd,
+            "randomCode":randomCode
+        },
+        success: function(data) {
+        	sessionStorage.setItem('token',data.token);
+        	if(data.code==200)
+            location.href = 'main.html';
+        }
+    });
+}
+function register() {
+    var username = $('#username').val();
+    var passwd = $('#passwd').val();
+    $.ajax({
+        url: '/users/register',
+        type: 'post',
+        data: {
+            "name": username,
+            "pwd": passwd
+        },
+        success: function(data) {
+        	console.log(data);
+        }
+    });
+}
+</script>

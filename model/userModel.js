@@ -1,8 +1,9 @@
 var user = {
-    insert: 'INSERT INTO staff(name,age,sex,address,depart,worklen,wage) VALUES(?,?,?,?,?,?,?)',
-    update:'update staff set name=?,age=?,sex=?,address=?,depart=?,worklen=?,wage=? where id=?',
-    delete:'delete from staff where id=?',
-    queryById:'select * from staff where id=?',
-    queryAll:'select * from staff',
+    insert: 'INSERT INTO user_t(name,pwd) VALUES(?,?)',
+    update:'update user_t set ',
+    delete:'delete from user_t where id=?',
+    queryById:'select * from user_t where id=?',
+    queryAll:'select * from user_t',
+    queryByName:'select * from user_t where name=?'
 }
 module.exports = user;

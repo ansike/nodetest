@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link href="../css/bootstrap.css" rel="stylesheet">
+    <script src="../js/jquery-1.12.4.js"></script>
+    <script src="../js/bootstrap.js"></script>
+    <link href="../css/summernote.css" rel="stylesheet">
+    <script src="../js/summernote.js"></script>
+</head>
+
+<body>
+    <div id="summernote">
+        <p>Hello Summernote ,<b>Hello jQuery插件库</b></p>
+    </div>
+    <form id="uploadForm" action="javascript:;">
+        <input type="file" name="file" id="fileBtn" class="file_btn" >
+        <label for="fileBtn">上传图片</label>
+        <button id="uploadBtn" class="upload_btn">删除图片</button>
+    </form>
+</body>
+<script>
+$(document).ready(function() {
+    $('#summernote').summernote();
+});
+$("#uploadBtn").click(function(){
+	$("#fileBtn").val("");
+})
+$(document).ready(function() {
+
+    $("#fileBtn").on('change', function() {
+
+    	var file= $("#fileBtn")[0].files[0];
+        var formData = new FormData();
+        formData.append("file",file);
+        //还可以用append方法添加一些附加信息参数为(name,value)，如下面的代码：
+        //formData.append('nickName','Jack');//-->后台用req.body.nickName将值'Jack'取出
+        $.ajax({
+            url: '/cate/uploadImg',
+            type: 'post',
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            cache: false,
+			dataType: 'json',
+            success: function(data) {
+                if (data.result === 'success') {
+                    alert("文件上传成功");
+                } else if (data.result === 'fail') {
+                    alert('文件上传失败：原因是' + data.reason);
+                }
+                $("<img/>").attr("src",data.path).appendTo($("#uploadForm"));
+            },
+            error: function(xhr) {
+                alert('文件上传失败：原因是' + xhr.status);
+            }
+        }); //end ajax
+    }); //end event
+});
+</script>
+
+</html>

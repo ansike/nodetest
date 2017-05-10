@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>添加顶级分类</title>
+    <link rel="stylesheet" href="../css/bootstrap.css" />
+    <link rel="stylesheet" href="../css/zTreeStyle.css" type="text/css">
+    <script src="../js/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="../js/jquery.ztree.core.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>增加顶级分类</h2>
+        <input type="text" class="form-control">
+        <br/>
+        <input type="text" class="form-control">
+        <br/>
+        <input type="text" class="form-control">
+        <br/>
+        <input type="text" class="form-control">
+        <br/>
+        <input type="text" class="form-control">
+        <br/>
+        <input type="text" class="form-control">
+        <br/>
+        <button class="btn btn-primary" onclick="sub()">提交</button>
+    </div>
+    <div id="bind">div</div>
+    <div id="open">立即打开</div>
+    <button class="btn btn-primary" onclick="query()">生成无限目录</button>
+    <div>
+        <ul id="treeDemo" class="ztree"></ul>
+    </div>
+</body>
+
+</html>
+<script>
+// $("#bind").on("ask",f2);
+// $("#bind").on("click",function () {
+// 	$("#bind").trigger("ask");
+// })
+// function f2() {
+// 	alert(2);
+// }
+
+$("#bind").on("click", function() {
+    console.log(f1());
+    f1().then(function(res) {
+        console.log(res + "111");
+    }).then(function() {
+        console.log("222");
+    }).always(function(res) {
+        console.log("333");
+    })
+});
+
+function f1() {
+    var deffer = new $.Deferred();
+    setTimeout(function() {
+        deffer.resolve("解决");
+    }, 4000)
+    return deffer.promise();
+}
+
+function sub() {
+    var arr = [];
+    $('.form-control').each(function() {
+        var item = $(this).val();
+        if ($.trim(item)) {
+            arr.push(item);
+        }
+    });
+
+    $.ajax({
+        url: '/cate/addTop',
+        type: 'post',
+        data: {
+            items: arr
+        },
+        complete: function(data) {
+            // location.href = './ztree.html';
+        }
+    });
+}
+
+function query() {
+    $.ajax({
+        type: 'post',
+        dataType: "jsonp",
+        url: 'http://localhost:3000/cate/query',
+        jsonpCallback: "callback",
+        data: {},
+        success: function(res) {
+            res = JSON.parse(res);
+            console.log(res);
+            var data = res['data'];
+            data = recursiveData(data, 0);
+            console.log(data);
+            zTreeObj = $.fn.zTree.init($("#treeDemo"), setting, data);
+        }
+
+    })
+}
+
+//递归处理数据成标准格式
+function recursiveData(data, pid) {
+    var result = [],
+        temp;
+    for (var i in data) {
+        if (data[i].pid == pid) {
+            result.push(data[i]);
+            temp = recursiveData(data, data[i].id);
+            if (temp.length > 0) {
+                data[i].children = temp;
+            }
+        }
+    }
+    return result;
+}
+var zTreeObj;
+// zTree 的参数配置，深入使用请参考 API 文档（setting 配置详解）
+var setting = {};
+// zTree 的数据属性，深入使用请参考 API 文档（zTreeNode 节点数据详解）
+var zNodes = [{
+    name: "test1",
+    open: true,
+    children: [{
+        name: "test1_1"
+    }, {
+        name: "test1_2"
+    }]
+}, {
+    name: "test2",
+    open: true,
+    children: [{
+        name: "test2_1"
+    }, {
+        name: "test2_2"
+    }]
+}];
+var xmlHttp;
+
+function createxmlHttpRequest() {
+    if (window.ActiveXObject) {
+        xmlHttp = new ActiveXObject("Microsoft.XMLHTTP");
+    } else if (window.XMLHttpRequest) {
+        xmlHttp = new XMLHttpRequest();
+    }
+}
+
+function doPost(url, data) {
+    // 注意在传参数值的时候最好使用encodeURI处理一下，以防出现乱码 
+    createxmlHttpRequest();
+    xmlHttp.open("post", url);
+    xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xmlHttp.onreadystatechange = function() {
+        if ((xmlHttp.readyState == 4) && (xmlHttp.status == 200)) {
+        	var text = xmlHttp.responseText;
+            console.log(text);
+            alert('success');
+        } else {
+            alert('fail');
+        }
+    }
+    xmlHttp.send(data);
+}
+doPost("./test.json",{"id":123});
+</script>
