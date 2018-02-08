@@ -104,8 +104,7 @@ module.exports = {
             }
             //文件信息在req.file或者req.files中显示。
             var file=req.file;
-
-            res.send({code:200,"msg":"上传成功","path":"http://localhost:90"+file.path});
+            res.send({code:200,"msg":"上传成功","path":"http://localhost:8090/uploads/"+file.filename});
         });
     }
 }
