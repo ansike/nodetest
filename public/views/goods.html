@@ -40,10 +40,14 @@ $(document).ready(function() {
     $("#fileBtn").on('change', function() {
 
     	var file= $("#fileBtn")[0].files[0];
+
+        var ul = 'http://c.hiphotos.baidu.com/image/h%3D300/sign=d82055dd788da977512f802b8050f872/91529822720e0cf3457ad8150146f21fbf09aa4b.jpg'
+        convertImgToDataURLviaCanvas(ul,function(data){
+            var blob = dataURLtoBlob(data);
+            
         var formData = new FormData();
-        formData.append("file",file);
-        //还可以用append方法添加一些附加信息参数为(name,value)，如下面的代码：
-        //formData.append('nickName','Jack');//-->后台用req.body.nickName将值'Jack'取出
+        formData.append("file", blob , 'a.jpg');
+
         $.ajax({
             url: '/cate/uploadImg',
             type: 'post',
@@ -52,7 +56,7 @@ $(document).ready(function() {
             contentType: false,
             processData: false,
             cache: false,
-			dataType: 'json',
+            dataType: 'json',
             xhr: function(){
     　　　　　　var xhr = $.ajaxSettings.xhr();
     　　　　　　if(onprogress && xhr.upload) {
@@ -69,10 +73,13 @@ $(document).ready(function() {
                 }
             },
             error: function(xhr) {
-                debugger
                 alert('文件上传失败：原因是' + xhr.status);
             }
         }); //end ajax
+        })
+        //还可以用append方法添加一些附加信息参数为(name,value)，如下面的代码：
+        //formData.append('nickName','Jack');//-->后台用req.body.nickName将值'Jack'取出
+        
     }); //end event
     function onprogress(evt){
     　　var loaded = evt.loaded;     //已经上传大小情况 
@@ -80,6 +87,30 @@ $(document).ready(function() {
      var per = Math.floor(100*loaded/tot);  //已经上传的百分比 
     　　$("#son").html( per +"%" );
      $("#son").css("width" , per +"%");
+    }
+    function convertImgToDataURLviaCanvas(url, callback, outputFormat){
+        var img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.onload = function(){
+            var canvas = document.createElement('CANVAS');
+            var ctx = canvas.getContext('2d');
+            var dataURL;
+            canvas.height = this.height;
+            canvas.width = this.width;
+            ctx.drawImage(this, 0, 0);
+            dataURL = canvas.toDataURL(outputFormat);
+            callback(dataURL);
+            canvas = null; 
+        };
+        img.src = url;
+    }
+    function dataURLtoBlob(dataurl) {
+        var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+            bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], {type:mime});
     }
 });
 </script>
